@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name": "allegra-new-prices",
+    "version": "1.0",
+    "description": "new price style",
+    "permissions": [
+      "*://app.allegrapos.rs/*"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["*://app.allegrapos.rs/*"],
+        "js": ["new-price-tags.js"]
+      }
+    ]
+  }
