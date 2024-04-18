@@ -3,17 +3,25 @@ const buttonStyle = {
   top: "12px",
   right: "30%",
   zIndex: "9999",
-  backgroundColor: "#1565c0",
+  backgroundColor: "rgb(28, 30, 40)",
   width: "140px",
   height: "40px",
-  borderColor: "rgb(28, 30, 40)",
+  borderColor: "#1565c0",
   borderWidth: "2px",
   borderStyle: "solid",
   fontSize: "14px",
   fontWeight: "700",
   color: "white",
-  borderRadius: "10px",
+  borderRadius: "7px",
   display: "none",
+};
+
+const newTableSettingsStyle = {
+  width: "100%",
+  height: "64px",
+  backgroundColor: "#cbcdd1",
+  overflow: "hidden",
+  borderRadius: "7px",
 };
 
 const showButton = () => {
@@ -29,6 +37,7 @@ const clickHandler = () => {
   if (table) {
     const tbody = table.querySelector("tbody");
     const allRows = tbody.querySelectorAll("tr");
+    const oldTableSettings = document.querySelector(".table-settings");
     if (allRows.length > 0) {
       if (button.innerHTML === "NOVE CENE") {
         const allOldTags = [];
@@ -40,11 +49,13 @@ const clickHandler = () => {
             }
           });
           row.style.display = "none";
-          button.innerHTML = "STARE CENE";
         });
         if (allOldTags.length > 0) {
+          button.innerHTML = "STARE CENE";
+          oldTableSettings.style.display = "none";
           const dataTags = collectingData(allOldTags);
-          console.log(dataTags);
+          createNewTableSettings(oldTableSettings);
+          createNewTags(dataTags);
         } else {
           alert("Sačekajte učitavanje cena!");
         }
@@ -53,6 +64,9 @@ const clickHandler = () => {
         allRows.forEach((row) => {
           row.style.display = "table-row";
         });
+        oldTableSettings.style.display = "flex";
+        document.querySelector(".newSettingsBar").remove();
+        // Ovde dodati kod da se izbrisu nove cene i novi setting-bar
       }
     } else {
       alert("Sačekajte učitavanje cena!");
@@ -80,6 +94,20 @@ const collectingData = (oldTags) => {
     dataTags.push(dataTag);
   });
   return dataTags;
+};
+
+const createNewTags = (dataTags) => {
+  // console.log(dataTags);
+};
+
+const createNewTableSettings = (oldTableSettings) => {
+  const parentElement = oldTableSettings.parentNode;
+
+  const newTableSettings = document.createElement("div");
+  newTableSettings.classList.add("newSettingsBar");
+  Object.assign(newTableSettings.style, newTableSettingsStyle);
+
+  parentElement.insertAdjacentElement("afterbegin", newTableSettings);
 };
 
 const button = document.createElement("button");
