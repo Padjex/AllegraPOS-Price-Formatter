@@ -17,12 +17,23 @@ const buttonStyle = {
 };
 
 const newTableSettingsStyle = {
+  display: "flex",
   width: "100%",
-  height: "64px",
+  height: "74px",
   backgroundColor: "#cbcdd1",
   overflow: "hidden",
   borderRadius: "7px",
 };
+
+const colorPickerContainerStyle = {
+  flex: '0.2',
+  height: '100%',
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
+}
+
 
 const showButton = () => {
   if ("#/admin/inventory/price-tags" === window.location.hash) {
@@ -103,12 +114,29 @@ const createNewTags = (dataTags) => {
 const createNewTableSettings = (oldTableSettings) => {
   const parentElement = oldTableSettings.parentNode;
 
-  const newTableSettings = document.createElement("div");
-  newTableSettings.classList.add("newSettingsBar");
-  Object.assign(newTableSettings.style, newTableSettingsStyle);
+  const newTableSettingsDiv = document.createElement("div");
+  newTableSettingsDiv.classList.add("newSettingsBar");
+  Object.assign(newTableSettingsDiv.style, newTableSettingsStyle);
 
-  parentElement.insertAdjacentElement("afterbegin", newTableSettings);
+  const colorPicker = createColorPicker()
+  newTableSettingsDiv.appendChild(colorPicker)
+
+  parentElement.insertAdjacentElement("afterbegin", newTableSettingsDiv);
 };
+
+const createColorPicker =()=>{
+  const colorPickerContainer = document.createElement('div')
+  Object.assign(colorPickerContainer.style,colorPickerContainerStyle)
+
+  const label = document.createElement('label')
+  label.for='favcolor'
+  label.innerText='Dizajn'
+
+  const colorInput = document.createElement('input')
+
+  return colorPickerContainer;
+  
+}
 
 const button = document.createElement("button");
 button.innerHTML = "NOVE CENE";
