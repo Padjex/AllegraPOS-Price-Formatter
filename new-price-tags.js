@@ -1,6 +1,7 @@
 var link = document.createElement('link');
 // link.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Lugrasimo&display=swap';
-link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet'
+// link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet'
+link.href = 'https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet"'
 link.rel = 'stylesheet';
 
 document.head.appendChild(link)
@@ -17,10 +18,25 @@ const showButton = () => {
   }
 };
 
+// const imageUrl = chrome.runtime.getURL('logo.png')
+
+let globalTable = null
+const changeableElements = {
+  'colorDesing': [],
+  'colorText': [],
+  'colorPrice': [],
+}
+const defaultSettings = {
+  'colorDesing': '#4695a4',
+  'colorText': '#9f1d1d',
+  'colorPrice': '#ff0531'
+}
+
 const clickHandler = () => {
   if ("#/admin/inventory/price-tags" === window.location.hash) {
     const table = document.querySelector("#price-tags");
     if (table) {
+      globalTable = table
       const tbody = table.querySelector("tbody");
       const allRows = tbody.querySelectorAll("tr");
       const oldTableSettings = document.querySelector(".table-settings");
@@ -113,11 +129,13 @@ const createNewTag = (tag) => {
   const tagContainer = document.createElement('div')
   // tagContainer.style.fontFamily = "Caveat"
   // tagContainer.style.fontFamily = 'Lugrasimo'
-  tagContainer.style.fontFamily = 'Montserrat'
+  // tagContainer.style.fontFamily = 'Montserrat'
   tagContainer.className = 'newTagContainer newPrintingElement'
 
   const desingTop = document.createElement('div')
   desingTop.className = "newDesing desingTop newPrintingElement"
+  desingTop.style.backgroundColor = defaultSettings['colorDesing']
+  changeableElements['colorDesing'].push(desingTop)
   tagContainer.appendChild(desingTop)
 
   const newTagInfoDiv = document.createElement('div')
@@ -127,10 +145,14 @@ const createNewTag = (tag) => {
   const newTagName = document.createElement('div')
   newTagName.className = 'newTagName newPrintingElement'
   newTagName.innerHTML = tag.name
+  newTagName.style.color = defaultSettings['colorText']
+  changeableElements['colorText'].push(newTagName)
   newTagInfoDiv.appendChild(newTagName)
 
   const newTagPrice = document.createElement('div')
   newTagPrice.className = 'newTagPrice newPrintingElement'
+  newTagPrice.style.color = defaultSettings['colorPrice']
+  changeableElements['colorPrice'].push(newTagPrice)
   newTagInfoDiv.appendChild(newTagPrice)
 
   const newPrice1 = document.createElement('div')
@@ -155,12 +177,22 @@ const createNewTag = (tag) => {
 
   const desingBottom = document.createElement('div')
   desingBottom.classList = "newDesing desingBottom newPrintingElement"
+  desingBottom.style.backgroundColor = defaultSettings['colorDesing']
+  changeableElements['colorDesing'].push(desingBottom)
   tagContainer.appendChild(desingBottom)
 
-  // const newLogoTag = document.createElement('img')
-  // newLogoTag.classList.add('newLogoTag')
-  // newLogoTag.src = ch
-  // tagContainer.appendChild(newLogoTag)
+  const newLogoTag = document.createElement('img')
+  newLogoTag.className = 'newLogoTag newPrintingElement'
+  newLogoTag.src = chrome.runtime.getURL('logo.png')
+
+  tagContainer.appendChild(newLogoTag)
+
+  if (tag.code) {
+    const newTagCode = document.createElement('div')
+    newTagCode.className = 'newTagCode newPrintingElement'
+    newTagCode.innerHTML = tag.code
+    tagContainer.appendChild(newTagCode)
+  }
 
   td.appendChild(tagContainer)
 
@@ -175,7 +207,7 @@ const createNewTableSettings = (oldTableSettings) => {
 
   const picker1Props = {
     text: "Dizajn",
-    color: "#3cb031"
+    color: defaultSettings['colorDesing']
   }
   const colorPicker1 = createColorPicker(picker1Props)
   newTableSettingsDiv.appendChild(colorPicker1)
@@ -183,21 +215,20 @@ const createNewTableSettings = (oldTableSettings) => {
 
   const picker2Props = {
     text: "Text",
-    color: "#6b1613"
+    color: defaultSettings['colorText']
   }
   const colorPicker2 = createColorPicker(picker2Props)
   newTableSettingsDiv.appendChild(colorPicker2)
 
   const picker3Props = {
-    text: 'Pozadina',
-    color: "#ffffff"
+    text: 'Cena',
+    color: defaultSettings['colorPrice']
   }
   const colorPicker3 = createColorPicker(picker3Props)
   newTableSettingsDiv.appendChild(colorPicker3)
 
   const slider1Props = {
     text: 'Visina',
-
   }
   const sliderRange1 = createRangeSlider(slider1Props)
   newTableSettingsDiv.appendChild(sliderRange1)
@@ -217,6 +248,10 @@ const createNewTableSettings = (oldTableSettings) => {
 };
 
 const createColorPicker = (props) => {
+  const newClassName = props.text === 'Dizajn' ? 'Desing' :
+    props.text === 'Text' ? 'Text' :
+      props.text === 'Cena' ? 'Price' : null
+
   const colorPickerContainer = document.createElement('div')
   colorPickerContainer.classList.add('newColorPickerDiv')
 
@@ -227,15 +262,31 @@ const createColorPicker = (props) => {
 
   const input = document.createElement("input");
   input.classList.add('newColorInput')
+  input.classList.add('newColor' + newClassName)
   input.setAttribute("type", "color");
   input.setAttribute("id", "favcolor");
   input.setAttribute("value", props.color);
-
+  input.addEventListener('input', changeColor)
 
   colorPickerContainer.appendChild(label)
   colorPickerContainer.appendChild(input)
 
   return colorPickerContainer;
+}
+
+const changeColor = (e) => {
+  const className = e.target.classList[1].substring(8)
+  const key = "color" + className.charAt(0).toUpperCase() + className.slice(1);
+
+  if (key.includes('Desing')) {
+    changeableElements[key].forEach((element) => {
+      element.style.backgroundColor = e.target.value
+    })
+  } else {
+    changeableElements[key].forEach((element) => {
+      element.style.color = e.target.value
+    })
+  }
 }
 
 const createRangeSlider = (props) => {
@@ -287,25 +338,8 @@ const replacePrintButtons = (x) => {
 }
 
 const newPrintTags = () => {
-  // const table = document.querySelector("#price-tags");
-  // const newContent = table.cloneNode(true)
-  // console.log(newContent);
   window.print()
-  // newPrintIFrame.contentDocument.head.appendChild(cssLink)
-  // newPrintIFrame.contentDocument.body.appendChild(newContent)
-  // newPrintIFrame.contentWindow.print()
 }
-
-// const newPrintIFrame = document.createElement('iframe')
-// newPrintIFrame.id = 'newPrintFrame'
-// newPrintIFrame.className = 'newPrintingElement'
-
-// var cssLink = document.createElement("link");
-// cssLink.href = 'style.css'
-// // cssLink.href = chrome.runtime.getURL('style.css')
-// cssLink.rel = "stylesheet";
-
-// document.body.appendChild(newPrintIFrame)
 
 const newMainButton = document.createElement("button");
 newMainButton.innerHTML = "NOVE CENE";
