@@ -18,18 +18,24 @@ const showButton = () => {
   }
 };
 
-// const imageUrl = chrome.runtime.getURL('logo.png')
 
 let globalTable = null
+// let globalHeightTbody = null
+
 const changeableElements = {
   'colorDesing': [],
   'colorText': [],
   'colorPrice': [],
+  'newTags': [],
+  'newRows': []
 }
+
 const defaultSettings = {
-  'colorDesing': '#4695a4',
-  'colorText': '#9f1d1d',
-  'colorPrice': '#ff0531'
+  'colorDesing': '#447e4d',
+  'colorText': '#36c44d',
+  'colorPrice': '#ff0531',
+  'heightTag': '140',
+  'nuberOfTdinRow': 4
 }
 
 const clickHandler = () => {
@@ -57,13 +63,19 @@ const clickHandler = () => {
             oldTableSettings.style.display = "none";
             const dataTags = collectingData(allOldTags);
             createNewTableSettings(oldTableSettings);
-            createNewTags(dataTags, tbody, 3);
+            createNewTags(dataTags, tbody, defaultSettings['nuberOfTdinRow']);
             replacePrintButtons(true)
+            // globalHeightTbody = tbody.clientHeight
           } else {
             alert("Sačekajte učitavanje cena!");
           }
         } else {
           newMainButton.innerHTML = "NOVE CENE";
+
+          for (let key in changeableElements) {
+            changeableElements[key] = []
+          }
+
           allRows.forEach((row) => {
             if (row.classList.contains('newTableRow'))
               row.remove()
@@ -73,6 +85,7 @@ const clickHandler = () => {
           oldTableSettings.style.display = "flex";
           document.querySelector(".newSettingsBar").remove();
           replacePrintButtons(false)
+          // tbody.style.height = 'max-content'
         }
       } else {
         alert("Sačekajte učitavanje cena!");
@@ -105,26 +118,25 @@ const collectingData = (oldTags) => {
 
 const createNewTags = (dataTags, table, n) => {
   table.classList.add('newPrintingElement')
+  table.classList.add('newTableBody')
   let currentRow;
-
   dataTags.forEach((tag, index) => {
-
     if (index % n === 0) {
       currentRow = document.createElement('tr');
-      // currentRow.classList.add('newTableRow')
+      changeableElements['newRows'].push(currentRow)
       currentRow.className = "newTableRow newPrintingElement"
       table.appendChild(currentRow)
     }
-
     const td = createNewTag(tag)
     currentRow.appendChild(td)
-
   })
 };
 
 const createNewTag = (tag) => {
   const td = document.createElement('td')
   td.className = 'newTableData newPrintingElement'
+  td.style.height = defaultSettings['heightTag'] + 'px'
+  changeableElements['newTags'].push(td)
 
   const tagContainer = document.createElement('div')
   // tagContainer.style.fontFamily = "Caveat"
@@ -229,6 +241,11 @@ const createNewTableSettings = (oldTableSettings) => {
 
   const slider1Props = {
     text: 'Visina',
+    min: 116,
+    max: 260,
+    step: 2,
+    value: defaultSettings['heightTag'],
+    onInput: changeHeight
   }
   const sliderRange1 = createRangeSlider(slider1Props)
   newTableSettingsDiv.appendChild(sliderRange1)
@@ -237,8 +254,9 @@ const createNewTableSettings = (oldTableSettings) => {
     text: 'Širina',
     min: 2,
     max: 6,
-    value: 3,
-    step: 1
+    step: 1,
+    value: defaultSettings['nuberOfTdinRow'],
+    onInput: changeWidth
   }
   const sliderRange2 = createRangeSlider(slider2Props)
   newTableSettingsDiv.appendChild(sliderRange2)
@@ -300,11 +318,15 @@ const createRangeSlider = (props) => {
 
   const input = document.createElement('input')
   input.setAttribute("type", "range");
-  input.setAttribute("min", "1");
-  input.setAttribute("max", "100");
-  input.setAttribute("value", "50");
-  input.setAttribute('step', "1")
+  input.setAttribute("min", props.min);
+  input.setAttribute("max", props.max);
+  input.setAttribute("value", props.value);
+  input.setAttribute('step', props.step)
   input.setAttribute("id", "sliderRange");
+
+  const newEvent = props.text === 'Visina' ? 'input' : 'change'
+  input.addEventListener(newEvent, props.onInput)
+
   input.classList.add("newSliderInput");
 
   sliderRangeContainer.appendChild(label)
@@ -312,6 +334,91 @@ const createRangeSlider = (props) => {
 
   return sliderRangeContainer
 }
+
+const changeHeight = (e) => {
+  // Try set height of tbody, not of all tag
+  const height = e.target.value
+  changeableElements['newTags'].forEach((element) => {
+    element.style.height = height + 'px'
+  })
+  // const tbody = globalTable.querySelector('tbody')
+  // const mul = height / 140
+  // const value = globalHeightTbody * mul
+  // tbody.style.height = value + 'px'
+}
+
+const changeWidth = (e) => {
+  const newWidth = e.target.value;
+  const currentWidth = changeableElements['newRows'][0].childElementCount
+
+  const tbody = globalTable.firstChild
+  changeableElements['newRows'].forEach(row => {
+    row.remove()
+  })
+
+  changeableElements['newRows'] = []
+
+  let newRow
+  changeableElements['newTags'].forEach((td, index) => {
+    if (index % newWidth === 0) {
+      newRow = document.createElement('tr')
+      newRow.className = "newTableRow newPrintingElement"
+      changeableElements['newRows'].push(newRow)
+      tbody.appendChild(newRow)
+    }
+
+    td.style.width = `${100 / newWidth}% !important`;
+    newRow.appendChild(td)
+  })
+  //*//*//
+  ////// MAYBE A BETTER WAY.
+  //*//*//
+  // if (newWidth < currentWidth) {
+  //   const diffrence = currentWidth - newWidth
+  //   const elementsToMove = []
+  //   changeableElements['newRows'].forEach((row, index) => {
+
+  //     const tdElements = Array.from(row.children)
+
+  //     const tdsToMove = tdElements.splice(-Math.min(diffrence + index, currentWidth))
+
+  //     elementsToMove.push(...tdsToMove)
+
+  //     tdsToMove.forEach(td => {
+  //       row.removeChild(td)
+  //     })
+
+  //     const numOfTdsToAdd = Math.min(index, newWidth)
+
+  //     for (let i = 0; i < numOfTdsToAdd; i++) {
+  //       row.insertBefore(elementsToMove[i], row.firstChild)
+  //     }
+
+  //     elementsToMove.splice(0, numOfTdsToAdd)
+  //   })
+
+  //   if (elementsToMove.length) {
+  //     const tbody = globalTable.firstChild
+  //     let newRow
+
+  //     elementsToMove.forEach((td, index) => {
+  //       if (index % newWidth === 0) {
+  //         newRow = document.createElement('tr')
+  //         newRow.className = "newTableRow newPrintingElement"
+  //         tbody.appendChild(newRow)
+  //       }
+  //       newRow.appendChild(td)
+  //       console.log(newRow);
+  //     })
+  //   }
+  // } else if (newWidth > currentWidth) {
+  //   console.log(newWidth);
+  // }
+  //*//*//
+  ////// MAYBE A BETTER WAY.
+  //*//*//
+}
+
 
 const replacePrintButtons = (x) => {
   const oldNavBar = document.querySelector('.v-card__title')

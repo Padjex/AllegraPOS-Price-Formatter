@@ -4,13 +4,26 @@
     }
 
     #price-tags {
+        /* width: 95vw !important; */
+        width: 220mm;
         height: 100%;
-        width: 100%;
         visibility: visible;
         position: absolute;
         top: -30%;
         left: 50%;
         transform: translateX(-50%);
+        /* table-layout: fixed; */
+        z-index: 1000;
+    }
+
+    .newTableBody {
+        /* width: 100% !important; */
+        /* height: 100%; */
+        /* position: relative; */
+        /* left: 50%; */
+        /* transform: translateX(-50%); */
+        /* top: -30%; */
+        /* overflow: hidden; */
     }
 
     .newPrintingElement {
@@ -163,10 +176,13 @@
 /* PRICE TAGS */
 .newTableRow {
     break-inside: avoid;
+    /* min-height: 96px !important; */
 }
 
 .newTableData {
-    height: 140px;
+    /* height: 160px; */
+    /* min-height: 96px !important; */
+    overflow: hidden;
 }
 
 .newTagContainer {
@@ -201,10 +217,12 @@
 
 .desingTop {
     top: 0;
+    border-bottom: 1px solid #090909;
 }
 
 .desingBottom {
     bottom: 0;
+    border-top: 1px solid #090909;
 }
 
 .newLogoTag {
@@ -255,7 +273,7 @@
     font-size: 240%;
     /* font-weight: 900; */
     font-weight: 700;
-    /* -webkit-text-stroke: 1.1px rgb(11, 0, 0); */
+    /* -webkit-text-stroke: 0.9px rgb(11, 0, 0); */
 }
 
 .newPrice2 {
