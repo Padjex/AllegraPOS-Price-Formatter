@@ -23,9 +23,9 @@ let globalTable = null
 // let globalHeightTbody = null
 
 const changeableElements = {
-  'colorDesing': [],
-  'colorText': [],
-  'colorPrice': [],
+  'newDesings': [],
+  'newTexts': [],
+  'newPrices': [],
   'newTags': [],
   'newRows': []
 }
@@ -35,7 +35,9 @@ const defaultSettings = {
   'colorText': '#36c44d',
   'colorPrice': '#ff0531',
   'heightTag': '140',
-  'nuberOfTdinRow': 4
+  'nuberOfTdinRow': 4,
+  'fontSizePrice': 33.6,
+  'fontSizeText': 15.4
 }
 
 const clickHandler = () => {
@@ -147,7 +149,7 @@ const createNewTag = (tag) => {
   const desingTop = document.createElement('div')
   desingTop.className = "newDesing desingTop newPrintingElement"
   desingTop.style.backgroundColor = defaultSettings['colorDesing']
-  changeableElements['colorDesing'].push(desingTop)
+  changeableElements['newDesings'].push(desingTop)
   tagContainer.appendChild(desingTop)
 
   const newTagInfoDiv = document.createElement('div')
@@ -158,13 +160,16 @@ const createNewTag = (tag) => {
   newTagName.className = 'newTagName newPrintingElement'
   newTagName.innerHTML = tag.name
   newTagName.style.color = defaultSettings['colorText']
-  changeableElements['colorText'].push(newTagName)
+  newTagName.style.fontSize = defaultSettings['fontSizeText'] + 'px'
+
+  changeableElements['newTexts'].push(newTagName)
   newTagInfoDiv.appendChild(newTagName)
 
   const newTagPrice = document.createElement('div')
   newTagPrice.className = 'newTagPrice newPrintingElement'
   newTagPrice.style.color = defaultSettings['colorPrice']
-  changeableElements['colorPrice'].push(newTagPrice)
+  newTagPrice.style.fontSize = defaultSettings['fontSizePrice'] + 'px'
+  changeableElements['newPrices'].push(newTagPrice)
   newTagInfoDiv.appendChild(newTagPrice)
 
   const newPrice1 = document.createElement('div')
@@ -190,7 +195,7 @@ const createNewTag = (tag) => {
   const desingBottom = document.createElement('div')
   desingBottom.classList = "newDesing desingBottom newPrintingElement"
   desingBottom.style.backgroundColor = defaultSettings['colorDesing']
-  changeableElements['colorDesing'].push(desingBottom)
+  changeableElements['newDesings'].push(desingBottom)
   tagContainer.appendChild(desingBottom)
 
   const newLogoTag = document.createElement('img')
@@ -217,13 +222,38 @@ const createNewTableSettings = (oldTableSettings) => {
   const newTableSettingsDiv = document.createElement("div");
   newTableSettingsDiv.classList.add("newSettingsBar");
 
+  const newSlidersContainer1 = document.createElement('div')
+  newSlidersContainer1.classList.add('newSlidersContainer1')
+  newTableSettingsDiv.appendChild(newSlidersContainer1)
+
+  const slider1Props = {
+    text: 'Visina',
+    min: 116,
+    max: 260,
+    step: 2,
+    value: defaultSettings['heightTag'],
+    onInput: changeHeight
+  }
+  const sliderRange1 = createRangeSlider(slider1Props)
+  newSlidersContainer1.appendChild(sliderRange1)
+
+  const slider2Props = {
+    text: 'Širina',
+    min: 2,
+    max: 6,
+    step: 1,
+    value: defaultSettings['nuberOfTdinRow'],
+    onInput: changeWidth
+  }
+  const sliderRange2 = createRangeSlider(slider2Props)
+  newSlidersContainer1.appendChild(sliderRange2)
+
   const picker1Props = {
     text: "Dizajn",
     color: defaultSettings['colorDesing']
   }
   const colorPicker1 = createColorPicker(picker1Props)
   newTableSettingsDiv.appendChild(colorPicker1)
-
 
   const picker2Props = {
     text: "Text",
@@ -239,36 +269,40 @@ const createNewTableSettings = (oldTableSettings) => {
   const colorPicker3 = createColorPicker(picker3Props)
   newTableSettingsDiv.appendChild(colorPicker3)
 
-  const slider1Props = {
-    text: 'Visina',
-    min: 116,
-    max: 260,
-    step: 2,
-    value: defaultSettings['heightTag'],
-    onInput: changeHeight
-  }
-  const sliderRange1 = createRangeSlider(slider1Props)
-  newTableSettingsDiv.appendChild(sliderRange1)
+  const newSlidersContainer2 = document.createElement('div')
+  newSlidersContainer2.classList.add('newSlidersContainer2')
+  newTableSettingsDiv.appendChild(newSlidersContainer2)
 
-  const slider2Props = {
-    text: 'Širina',
-    min: 2,
-    max: 6,
+  const slider3Props = {
+    text: 'Text',
+    min: 8.4,
+    max: 24.4,
     step: 1,
-    value: defaultSettings['nuberOfTdinRow'],
-    onInput: changeWidth
+    value: defaultSettings['fontSizeText'],
+    onInput: changeFontSize
   }
-  const sliderRange2 = createRangeSlider(slider2Props)
-  newTableSettingsDiv.appendChild(sliderRange2)
+  const sliderRange3 = createRangeSlider(slider3Props)
+  newSlidersContainer2.appendChild(sliderRange3)
 
+
+  const slider4Props = {
+    text: 'Cena',
+    min: 15.6,
+    max: 55.6,
+    step: 2,
+    value: defaultSettings['fontSizePrice'],
+    onInput: changeFontSize
+  }
+  const sliderRange4 = createRangeSlider(slider4Props)
+  newSlidersContainer2.appendChild(sliderRange4)
 
   parentElement.insertAdjacentElement("afterbegin", newTableSettingsDiv);
 };
 
 const createColorPicker = (props) => {
-  const newClassName = props.text === 'Dizajn' ? 'Desing' :
-    props.text === 'Text' ? 'Text' :
-      props.text === 'Cena' ? 'Price' : null
+  const newClassName = props.text === 'Dizajn' ? 'Desings' :
+    props.text === 'Text' ? 'Texts' :
+      props.text === 'Cena' ? 'Prices' : null
 
   const colorPickerContainer = document.createElement('div')
   colorPickerContainer.classList.add('newColorPickerDiv')
@@ -294,7 +328,7 @@ const createColorPicker = (props) => {
 
 const changeColor = (e) => {
   const className = e.target.classList[1].substring(8)
-  const key = "color" + className.charAt(0).toUpperCase() + className.slice(1);
+  const key = "new" + className.charAt(0).toUpperCase() + className.slice(1);
 
   if (key.includes('Desing')) {
     changeableElements[key].forEach((element) => {
@@ -308,6 +342,8 @@ const changeColor = (e) => {
 }
 
 const createRangeSlider = (props) => {
+  const className = props.text === 'Text' ? "Texts" : props.text === 'Cena' ? 'Prices' : 'Tags'
+
   const sliderRangeContainer = document.createElement('div')
   sliderRangeContainer.classList.add('newSliderRangeDiv')
 
@@ -324,10 +360,11 @@ const createRangeSlider = (props) => {
   input.setAttribute('step', props.step)
   input.setAttribute("id", "sliderRange");
 
-  const newEvent = props.text === 'Visina' ? 'input' : 'change'
+  const newEvent = props.text === 'Širina' ? 'change' : 'input'
   input.addEventListener(newEvent, props.onInput)
 
   input.classList.add("newSliderInput");
+  input.classList.add('newFontSize' + className)
 
   sliderRangeContainer.appendChild(label)
   sliderRangeContainer.appendChild(input)
@@ -341,10 +378,6 @@ const changeHeight = (e) => {
   changeableElements['newTags'].forEach((element) => {
     element.style.height = height + 'px'
   })
-  // const tbody = globalTable.querySelector('tbody')
-  // const mul = height / 140
-  // const value = globalHeightTbody * mul
-  // tbody.style.height = value + 'px'
 }
 
 const changeWidth = (e) => {
@@ -370,53 +403,15 @@ const changeWidth = (e) => {
     td.style.width = `${100 / newWidth}% !important`;
     newRow.appendChild(td)
   })
-  //*//*//
-  ////// MAYBE A BETTER WAY.
-  //*//*//
-  // if (newWidth < currentWidth) {
-  //   const diffrence = currentWidth - newWidth
-  //   const elementsToMove = []
-  //   changeableElements['newRows'].forEach((row, index) => {
+}
 
-  //     const tdElements = Array.from(row.children)
+const changeFontSize = (e) => {
+  const className = e.target.classList[1].substring(11)
+  const key = "new" + className.charAt(0).toUpperCase() + className.slice(1);
 
-  //     const tdsToMove = tdElements.splice(-Math.min(diffrence + index, currentWidth))
-
-  //     elementsToMove.push(...tdsToMove)
-
-  //     tdsToMove.forEach(td => {
-  //       row.removeChild(td)
-  //     })
-
-  //     const numOfTdsToAdd = Math.min(index, newWidth)
-
-  //     for (let i = 0; i < numOfTdsToAdd; i++) {
-  //       row.insertBefore(elementsToMove[i], row.firstChild)
-  //     }
-
-  //     elementsToMove.splice(0, numOfTdsToAdd)
-  //   })
-
-  //   if (elementsToMove.length) {
-  //     const tbody = globalTable.firstChild
-  //     let newRow
-
-  //     elementsToMove.forEach((td, index) => {
-  //       if (index % newWidth === 0) {
-  //         newRow = document.createElement('tr')
-  //         newRow.className = "newTableRow newPrintingElement"
-  //         tbody.appendChild(newRow)
-  //       }
-  //       newRow.appendChild(td)
-  //       console.log(newRow);
-  //     })
-  //   }
-  // } else if (newWidth > currentWidth) {
-  //   console.log(newWidth);
-  // }
-  //*//*//
-  ////// MAYBE A BETTER WAY.
-  //*//*//
+  changeableElements[key].forEach(element => {
+    element.style.fontSize = e.target.value + 'px'
+  })
 }
 
 
