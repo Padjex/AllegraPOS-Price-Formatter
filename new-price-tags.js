@@ -35,7 +35,7 @@ const defaultSettings = {
   'colorText': '#36c44d',
   'colorPrice': '#ff0531',
   'heightTag': '140',
-  'nuberOfTdinRow': 4,
+  'nuberOfTdinRow': 3,
   'fontSizePrice': 33.6,
   'fontSizeText': 15.4
 }
@@ -102,10 +102,12 @@ const collectingData = (oldTags) => {
   const dataTags = [];
   oldTags.forEach((tag) => {
     const divs = tag.querySelectorAll("div > div");
+    const barcode = tag.querySelector('.vue-barcode-element')
 
     const dataTag = {
       name: divs[1].innerHTML,
       price: divs[4].innerHTML,
+      barcode: barcode,
       code: null,
     };
 
@@ -209,6 +211,28 @@ const createNewTag = (tag) => {
     newTagCode.className = 'newTagCode newPrintingElement'
     newTagCode.innerHTML = tag.code
     tagContainer.appendChild(newTagCode)
+  }
+
+  if(tag.barcode) {
+    const barCode = tag.barcode.cloneNode(true)
+    barCode.classList.add('newBarcode')
+
+    const g = barCode.querySelector('g')
+    g.classList.add('newBarcodeG')
+    
+    const allRect = barCode.querySelectorAll('rect')
+    allRect.forEach(rect => {
+      rect.classList.add('newBarcodeRect')
+    })
+    
+
+    const text = barCode.querySelector('text')
+    text.remove()
+
+    const rect = barCode.querySelector('rect')
+    rect.remove()
+
+    desingBottom.appendChild(barCode)
   }
 
   td.appendChild(tagContainer)

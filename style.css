@@ -232,8 +232,15 @@
 }
 
 .desingBottom {
+    height: 19.4%;
     bottom: 0;
     border-top: 1px solid #090909;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
 }
 
 .newLogoTag {
@@ -331,4 +338,24 @@
     font-size: 14px;
     display: flex;
     justify-content: center;
+}
+
+/* New barcode */
+.newBarcode {
+    height: 100%;
+    margin: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.newBarcodeG {
+    /* transform: scaleX(1.4) !important; */
+    /* fill: #ffffff !important; */
+    height: 100%;
+}
+
+.newBarcodeRect {
+    height: 100%;
 }
