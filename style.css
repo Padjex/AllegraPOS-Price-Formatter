@@ -66,6 +66,7 @@
     overflow: hidden;
 
     padding: 0px 10px;
+    padding-bottom: 18px;
 }
 
 /* COLOR PICKERS */
@@ -127,6 +128,7 @@
 }
 
 .newSliderRangeDiv {
+    position: relative;
     display: flex;
     flex-direction: column;
 
@@ -148,6 +150,28 @@
     margin: 0px 10px;
 }
 
+.newRangeValue{
+    left: 9px;
+    top: 34%;
+
+    transform: translateY(-50%);
+
+    position: absolute;
+    z-index: 11;
+
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+
+    border-radius: 40px;
+    border: 2px solid #ffffff;
+
+    padding: 0 6px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 
 /* NEW PRINT BUTTON */
@@ -350,12 +374,26 @@
     align-items: center;
 }
 
-.newBarcodeG {
-    /* transform: scaleX(1.4) !important; */
-    /* fill: #ffffff !important; */
-    height: 100%;
-}
 
 .newBarcodeRect {
     height: 100%;
+}
+
+/* .newBarcodeText {
+    font-size: 14px;
+    font-weight: 900;
+    color: #ffffff;
+    -webkit-text-stroke: 0.5px #090909;
+} */
+
+/* For number from barcode */
+
+.newBarcodeDiv{
+    font-weight: 900;
+    color: #ffffff;
+    -webkit-text-stroke: 0.6px #020202;
+
+    white-space: nowrap;
+    letter-spacing: 1.4px;
+
 }

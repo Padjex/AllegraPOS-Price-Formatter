@@ -22,12 +22,14 @@ const showButton = () => {
 let globalTable = null
 // let globalHeightTbody = null
 
+
+
 const changeableElements = {
   'newDesings': [],
   'newTexts': [],
   'newPrices': [],
   'newTags': [],
-  'newRows': []
+  'newRows': [],
 }
 
 const defaultSettings = {
@@ -38,6 +40,13 @@ const defaultSettings = {
   'nuberOfTdinRow': 3,
   'fontSizePrice': 33.6,
   'fontSizeText': 15.4
+}
+
+currentValues = {
+  'currentWidth': null,
+  'currentHeight': null,
+  'fontSizeText': null,
+  'fontSizePrice': null
 }
 
 const clickHandler = () => {
@@ -214,25 +223,47 @@ const createNewTag = (tag) => {
   }
 
   if(tag.barcode) {
-    const barCode = tag.barcode.cloneNode(true)
-    barCode.classList.add('newBarcode')
-
-    const g = barCode.querySelector('g')
-    g.classList.add('newBarcodeG')
+    // // // //
+    // FOR THE PART THAT DISPLAYS THE BARCODE !!!!!!!!!!!!!
+    // // // // 
+    // const barCode = tag.barcode.cloneNode(true)
+    // barCode.classList.add('newBarcode')
+   
+    // const allRect = barCode.querySelectorAll('rect')
+    // allRect.forEach(rect => {
+    //   rect.classList.add('newBarcodeRect')
+    //   // rect.remove()
+    // })
     
-    const allRect = barCode.querySelectorAll('rect')
-    allRect.forEach(rect => {
-      rect.classList.add('newBarcodeRect')
-    })
+
+    // const textSVG = barCode.querySelector('text') 
+    // textSVG.remove()
+
+    // const rect = barCode.querySelector('rect')
+    // if(rect){
+    //   rect.remove()
+    // }
+
+    // desingBottom.appendChild(barCode)
+
+    // // // //
+    // FOR THE PART THAT DISPLAYS THE BARCODE !!!!!!!!!!!!!
+    // // // //
+
+    // ***********
+    // **** FOR THE PART THAT DISPLAYS ONLY THE BARCODE NUMBER
+    // ***********
     
+    const barcodeNumber = tag.barcode.querySelector('text').textContent
+    
+    const newBarcodeDiv = document.createElement('div')
+    newBarcodeDiv.className = 'newBarcodeDiv'
+    newBarcodeDiv.innerHTML = barcodeNumber
 
-    const text = barCode.querySelector('text')
-    text.remove()
-
-    const rect = barCode.querySelector('rect')
-    rect.remove()
-
-    desingBottom.appendChild(barCode)
+    desingBottom.appendChild(newBarcodeDiv)
+    // ***********
+    // **** FOR THE PART THAT DISPLAYS ONLY THE BARCODE NUMBER
+    // ***********
   }
 
   td.appendChild(tagContainer)
@@ -252,7 +283,7 @@ const createNewTableSettings = (oldTableSettings) => {
 
   const slider1Props = {
     text: 'Visina',
-    min: 116,
+    min: 115,
     max: 260,
     step: 2,
     value: defaultSettings['heightTag'],
@@ -366,6 +397,7 @@ const changeColor = (e) => {
 }
 
 const createRangeSlider = (props) => {
+  
   const className = props.text === 'Text' ? "Texts" : props.text === 'Cena' ? 'Prices' : 'Tags'
 
   const sliderRangeContainer = document.createElement('div')
@@ -390,8 +422,20 @@ const createRangeSlider = (props) => {
   input.classList.add("newSliderInput");
   input.classList.add('newFontSize' + className)
 
+  const divValue = document.createElement('div')
+  divValue.classList.add('newRangeValue')
+  divValue.innerHTML = Math.round(props.value);
+
+  const labelValueKey = props.text === 'Širina' ? 'currentWidth' : props.text === 'Visina' ? 'currentHeight' : 
+        props.text === 'Text' ? 'fontSizeText' : 'fontSizePrice'
+
+  currentValues[labelValueKey] = divValue
+  
+  console.log(currentValues);
+  
   sliderRangeContainer.appendChild(label)
   sliderRangeContainer.appendChild(input)
+  sliderRangeContainer.appendChild(divValue)
 
   return sliderRangeContainer
 }
@@ -402,6 +446,8 @@ const changeHeight = (e) => {
   changeableElements['newTags'].forEach((element) => {
     element.style.height = height + 'px'
   })
+
+  currentValues['currentHeight'].innerHTML = Math.round(height)
 }
 
 const changeWidth = (e) => {
@@ -427,15 +473,23 @@ const changeWidth = (e) => {
     td.style.width = `${100 / newWidth}% !important`;
     newRow.appendChild(td)
   })
+
+  currentValues['currentWidth'].textContent = newWidth
 }
 
 const changeFontSize = (e) => {
   const className = e.target.classList[1].substring(11)
+  console.log(className);
+  
   const key = "new" + className.charAt(0).toUpperCase() + className.slice(1);
 
   changeableElements[key].forEach(element => {
     element.style.fontSize = e.target.value + 'px'
   })
+
+  const labelValueKey = className === 'Texts' ? 'fontSizeText' : 'fontSizePrice'
+
+  currentValues[labelValueKey].innerHTML = Math.round(e.target.value)
 }
 
 
